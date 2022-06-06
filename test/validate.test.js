@@ -59,7 +59,7 @@ function createSchemaWithAsyncSubschema() {
 }
 
 describe('#validate()', () => {
-  it('does not error on schemas without validation', done => {
+  it('does not error on schemas without validation', (done) => {
     const schema = createContactSchema()
     schema.validate(
       schema.makeDefault({ name: 'Paul' }),
@@ -89,7 +89,7 @@ describe('#validate()', () => {
     assert.deepStrictEqual(errors, { name: 'Full Name is required' })
   })
 
-  it('returns error for missing property', done => {
+  it('returns error for missing property', (done) => {
     const properties = createContactSchema().getProperties()
     assert.deepStrictEqual(properties.name.validators, undefined)
     properties.name.validators = {
@@ -106,7 +106,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('uses the [all] set by default', done => {
+  it('uses the [all] set by default', (done) => {
     const properties = createContactSchema().getProperties()
     assert.deepStrictEqual(properties.name.validators, undefined)
     properties.name.validators = {
@@ -124,7 +124,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('returns error for missing property but not for valid property', done => {
+  it('returns error for missing property but not for valid property', (done) => {
     const properties = createContactSchema().getProperties()
     assert.deepStrictEqual(properties.name.validators, undefined)
     properties.name.validators = {
@@ -147,7 +147,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('uses all validators', done => {
+  it('uses all validators', (done) => {
     const properties = createContactSchema().getProperties()
 
     properties.name.validators = {
@@ -166,7 +166,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('validates only for tag passed in', done => {
+  it('validates only for tag passed in', (done) => {
     const properties = createContactSchema().getProperties()
 
     // Adding required validation to a schema property with a tag
@@ -191,7 +191,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('validates by tag and by set', done => {
+  it('validates by tag and by set', (done) => {
     const properties = createContactSchema().getProperties()
 
     properties.name.validators = {
@@ -218,7 +218,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('allows tag and set to be optional parameters', done => {
+  it('allows tag and set to be optional parameters', (done) => {
     const properties = createContactSchema().getProperties()
 
     properties.name.validators = {
@@ -255,7 +255,7 @@ describe('#validate()', () => {
     })
   })
 
-  it('validates sub-schemas where subschema is returned from the type property function', done => {
+  it('validates sub-schemas where subschema is returned from the type property function', (done) => {
     const properties = createBlogSchema().getProperties()
     const subschemaProperties = createContactSchema().getProperties()
     const object = { author: 1 }
@@ -329,7 +329,7 @@ describe('#validate()', () => {
     })
   })
 
-  it('validators failure should not prevent other properties’ sub-schemas from validating', done => {
+  it('validators failure should not prevent other properties’ sub-schemas from validating', (done) => {
     // this is an edge case, and having the required validator on author is crucial. without it,
     // the bug won’t manifest itself
     const properties = createBlogSchema().getProperties()
@@ -370,9 +370,10 @@ describe('#validate()', () => {
     })
   })
 
-  it('Validates array sub-schemas', done => {
+  it('Validates array sub-schemas', (done) => {
     const properties = createBlogSchema().getProperties()
-    const subschemaProperties = properties.comments.type.arraySchema.getProperties()
+    const subschemaProperties =
+      properties.comments.type.arraySchema.getProperties()
 
     subschemaProperties.email.validators = {
       all: [required]
@@ -403,11 +404,14 @@ describe('#validate()', () => {
     })
   })
 
-  it('Validates array sub-schemas and maintains order of errors for async validators', done => {
+  it('Validates array sub-schemas and maintains order of errors for async validators', (done) => {
     const schema = createSchemaWithAsyncSubschema()
 
     const model = {
-      items: [{ id: '1', quantity: '' }, { id: '', quantity: '' }]
+      items: [
+        { id: '1', quantity: '' },
+        { id: '', quantity: '' }
+      ]
     }
 
     const validationErrors = {
@@ -423,7 +427,7 @@ describe('#validate()', () => {
     })
   })
 
-  it('Does not throw a stack size error when validating a large array set', done => {
+  it('Does not throw a stack size error when validating a large array set', (done) => {
     const schema = createBlogSchema()
     const model = schema.makeBlank()
 
@@ -438,8 +442,9 @@ describe('#validate()', () => {
     }, 'should not thrown an exception')
   })
 
-  it('should cause an error if a subschema is passed un-invoked', done => {
-    const properties = createBlogSchemaWithSubschemaNotInitialised().getProperties()
+  it('should cause an error if a subschema is passed un-invoked', (done) => {
+    const properties =
+      createBlogSchemaWithSubschemaNotInitialised().getProperties()
 
     const testValues = [undefined, null, '', 0, []]
     const subschema = properties.comments.type.arraySchema.getProperties()
@@ -464,7 +469,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('does not try and validate array sub-schemas that are falsy or []', done => {
+  it('does not try and validate array sub-schemas that are falsy or []', (done) => {
     const properties = createBlogSchema().getProperties()
     const testValues = [undefined, null, '', 0, []]
     const subschema = properties.comments.type.arraySchema.getProperties()
@@ -489,7 +494,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('does not try and validate sub-schemas that are falsy', done => {
+  it('does not try and validate sub-schemas that are falsy', (done) => {
     const kidSchema = createKidSchema()
     const kid = kidSchema.makeBlank()
     const emptyValues = [undefined, null, '', 0]
@@ -508,7 +513,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('allows error response to be a string instead of Error object', done => {
+  it('allows error response to be a string instead of Error object', (done) => {
     const properties = createContactSchema().getProperties()
     properties.name.validators = {
       all: [
@@ -526,14 +531,14 @@ describe('#validate()', () => {
     })
   })
 
-  it('should not call the callback multiple times when omitting optional args', done => {
+  it('should not call the callback multiple times when omitting optional args', (done) => {
     const schema = createBlogSchema()
     schema.validate(schema.makeDefault({ comments: [{}, {}] }), 'all', () => {
       done()
     })
   })
 
-  it('should pass the parent to callback if it has five arguments and is a subschema', done => {
+  it('should pass the parent to callback if it has five arguments and is a subschema', (done) => {
     const properties = createBlogSchema().getProperties()
     const subschema = properties.author.type.getProperties()
     let schemaParent = null
@@ -557,7 +562,7 @@ describe('#validate()', () => {
     })
   })
 
-  it('should pass the schema as parent to callback if it has five arguments and is not a subschema', done => {
+  it('should pass the schema as parent to callback if it has five arguments and is not a subschema', (done) => {
     const properties = createBlogSchema().getProperties()
     let schemaParent
     properties.title.validators = {
@@ -578,7 +583,7 @@ describe('#validate()', () => {
     })
   })
 
-  it('should not leak parents across validates', done => {
+  it('should not leak parents across validates', (done) => {
     const properties = createBlogSchema().getProperties()
     const schemaParents = []
     const expectedParents = fixtures.expectedParents

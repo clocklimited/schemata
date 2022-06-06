@@ -53,13 +53,13 @@ describe('#schema', () => {
       { a: { defaultValue: 20 } }
     ]
 
-    badSchemas.forEach(properties => {
+    badSchemas.forEach((properties) => {
       assert.throws(() => {
         schemata({ name: 'Bad', properties })
       })
     })
 
-    goodSchemas.forEach(properties => {
+    goodSchemas.forEach((properties) => {
       assert.doesNotThrow(() => {
         schemata({ name: 'Good', properties })
       })

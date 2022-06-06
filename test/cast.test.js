@@ -12,7 +12,7 @@ const required = require('validity-required')
 
 describe('#cast()', () => {
   it('converts types correctly', () => {
-    Object.keys(assertions).forEach(type => {
+    Object.keys(assertions).forEach((type) => {
       // Even = assert.strictEqualed, odd = supplied
       for (let i = 0; i < assertions[type].length; i += 2) {
         const cast = castProperty(typeMap[type], assertions[type][i + 1])
@@ -22,21 +22,21 @@ describe('#cast()', () => {
   })
 
   it('converts arrays correctly', () => {
-    ;[[], null, ''].forEach(value => {
+    ;[[], null, ''].forEach((value) => {
       assert.strictEqual(Array.isArray(castProperty(Array, value)), true)
       assert.strictEqual(castProperty(Array, value).length, 0)
     })
-    ;[[1], ['a']].forEach(value => {
+    ;[[1], ['a']].forEach((value) => {
       assert.strictEqual(Array.isArray(castProperty(Array, value)), true)
       assert.strictEqual(castProperty(Array, value).length, 1)
     })
   })
 
   it('converts object correctly', () => {
-    ;['', 'hello', [], undefined].forEach(value => {
+    ;['', 'hello', [], undefined].forEach((value) => {
       assert.strictEqual(Object.keys(castProperty(Object, value)).length, 0)
     })
-    ;[{ a: 'b' }].forEach(value => {
+    ;[{ a: 'b' }].forEach((value) => {
       assert.strictEqual(Object.keys(castProperty(Object, value)).length, 1)
     })
     assert.strictEqual(castProperty(Object, null) === null, true)
@@ -100,7 +100,7 @@ describe('#cast()', () => {
       comments: []
     }
 
-    schema.getProperties().author.type = model => {
+    schema.getProperties().author.type = (model) => {
       assert.deepStrictEqual(model, initialObj)
       return createContactSchema()
     }
@@ -114,7 +114,7 @@ describe('#cast()', () => {
 
     const initialObj = { title: 'My Blog', author: null, comments: [] }
 
-    schema.getProperties().author.type = model => {
+    schema.getProperties().author.type = (model) => {
       assert.deepStrictEqual(model, initialObj)
       return createContactSchema()
     }
@@ -144,7 +144,7 @@ describe('#cast()', () => {
           // just ensures that each of the values is a number
           const schema = {}
           if (!obj || !obj.tyreWear) return createNamedSchemata(schema)
-          Object.keys(obj.tyreWear).forEach(k => {
+          Object.keys(obj.tyreWear).forEach((k) => {
             schema[k] = {
               type: Number,
               validators: { all: [required] }

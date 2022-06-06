@@ -62,7 +62,8 @@ const createCommentSchema = () => {
   })
 }
 
-const createNamedSchemata = properties => schemata({ name: 'Foo', properties })
+const createNamedSchemata = (properties) =>
+  schemata({ name: 'Foo', properties })
 
 module.exports = {
   createContactSchema,

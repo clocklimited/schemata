@@ -139,7 +139,7 @@ describe('#makeDefault()', () => {
 
     // This function gets called twice, once in makeBlank and once for makeDefault.
     // We want to test the 2nd call
-    schema.getProperties().author.type = model => {
+    schema.getProperties().author.type = (model) => {
       if (called === false) return createContactSchema()
       called = true
       assert.deepStrictEqual(model, obj)
