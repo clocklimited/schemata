@@ -1,5 +1,9 @@
 # Changelog
 
+### Unreleased
+
+This version drops support for Node versions below 12.
+
 ### v7.0.0
 
 This should be compatible with v6 but has some major rewrites, hence the version bump.
