@@ -39,7 +39,7 @@
     "jest": "^28.1.0",
     "mocha": "^10.0.0",
     "nyc": "^15.1.0",
-    "prettier": "^1.17.1",
+    "prettier": "^2.6.2",
     "required": "^1.0.0",
     "validity": "^1.1.1",
     "validity-length": "^2.0.0",
@@ -57,7 +57,7 @@
   ],
   "scripts": {
     "lint:js": "eslint . -f unix --cache --ext '.js'",
-    "prettier": "prettier --write '**/*.{js}'",
+    "prettier": "prettier --write **/*.js",
     "test": "yarn test:code && yarn lint:js",
     "test:code": "nyc mocha",
     "run-test": "mocha",
