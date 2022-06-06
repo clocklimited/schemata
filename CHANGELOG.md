@@ -2,6 +2,42 @@
 
 ### Unreleased
 
+ - Validator cadence has changed. Now, if you provide validators as an array, these will ALWAYS be run when validating against a specific validation set.
+     Beforehand, the following was valid:
+
+     ```js
+const schemata = require('schemata')
+const required = require('validity-required')
+
+const animal = schemata({
+  name: 'Animal',
+  description: 'An animal',
+  properties: {
+    numberOfLegs: {
+      type: Number,
+      validators: [required]
+    },
+    numberOfGills: {
+      type: Number,
+      validators: {
+        aquatic: [required]
+      }
+    }
+  }
+})
+
+const errors = await animal.validate({ numberOfGills: 2 }, 'aquatic')
+// errors = {}
+
+     ```
+
+     With the new version, `.all` and `[]` _are_ functionally equivalent and behave as expected, so you would encounter:
+
+     ```js
+const errors = await animal.validate({ numberOfGills: 2 }, 'aquatic')
+// errors = { numberOfLegs: 'Number of legs is required' }
+     ```
+
  - You can now extend schemata instances as much as you please using schemata.extend.
  - This version drops support for Node versions below 14.
 
