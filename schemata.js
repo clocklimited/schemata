@@ -12,7 +12,7 @@ const convertCamelcaseToHuman = require('./lib/camelcase-to-human-converter')
 const createSchemata = ({ name, description, properties } = {}) => {
   if (name === undefined) throw new Error('name is required')
   const internalSchema = clone(properties || {})
-  Object.keys(internalSchema).forEach(k => {
+  Object.keys(internalSchema).forEach((k) => {
     if (!properties[k].defaultValue) return
     if (typeof properties[k].defaultValue === 'function') return
     if (isPrimitive(properties[k].defaultValue)) return
@@ -44,7 +44,7 @@ const createSchemata = ({ name, description, properties } = {}) => {
     makeBlank() {
       const newEntity = {}
 
-      Object.keys(internalSchema).forEach(key => {
+      Object.keys(internalSchema).forEach((key) => {
         const type = getType(internalSchema[key].type)
 
         if (typeof type === 'object') {
@@ -87,7 +87,7 @@ const createSchemata = ({ name, description, properties } = {}) => {
 
       if (!existingEntity) existingEntity = {}
 
-      Object.keys(internalSchema).forEach(key => {
+      Object.keys(internalSchema).forEach((key) => {
         const property = internalSchema[key]
         const existingValue = existingEntity[key]
         const type = getType(property.type, existingEntity)
@@ -135,7 +135,7 @@ const createSchemata = ({ name, description, properties } = {}) => {
     stripUnknownProperties(entityObject, tag, ignoreTagForSubSchemas) {
       const newEntity = {}
 
-      Object.keys(entityObject).forEach(key => {
+      Object.keys(entityObject).forEach((key) => {
         const property = internalSchema[key]
         let subSchemaTag
 
@@ -182,13 +182,12 @@ const createSchemata = ({ name, description, properties } = {}) => {
 
           subSchemaTag = ignoreTagForSubSchemas ? undefined : tag
           entityObject[key].forEach((item, index) => {
-            newEntity[key][
-              index
-            ] = property.type.arraySchema.stripUnknownProperties(
-              item,
-              subSchemaTag,
-              ignoreTagForSubSchemas
-            )
+            newEntity[key][index] =
+              property.type.arraySchema.stripUnknownProperties(
+                item,
+                subSchemaTag,
+                ignoreTagForSubSchemas
+              )
           })
         }
       })
@@ -203,7 +202,7 @@ const createSchemata = ({ name, description, properties } = {}) => {
     cast(entityObject, tag) {
       const newEntity = {}
 
-      Object.keys(entityObject).forEach(key => {
+      Object.keys(entityObject).forEach((key) => {
         // Copy all properties
         newEntity[key] = entityObject[key]
 
