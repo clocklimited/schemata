@@ -1,5 +1,5 @@
 {
-  "name": "schemata",
+  "name": "@clocklimited/schemata",
   "description": "Define, create, and validate your business objects, based on well defined schema.",
   "version": "7.0.3",
   "author": "Paul Serby <paul@serby.net>",
@@ -50,7 +50,7 @@
     "schema",
     "data"
   ],
-  "repository": "git://github.com/serby/schemata.git",
+  "repository": "git://github.com/clocklimited/schemata.git",
   "main": "./dist/schemata.js",
   "files": [
     "./dist"
@@ -60,6 +60,7 @@
     "prettier": "prettier --write '**/*.{js}'",
     "test": "yarn test:code && yarn lint:js",
     "test:code": "nyc mocha",
+    "run-test": "mocha",
     "test:watch": "mocha --watch",
     "build": "rm -rf dist && mkdir dist && babel schemata.js -d dist && babel lib -d dist/lib",
     "prepublish": "yarn test && yarn build"
