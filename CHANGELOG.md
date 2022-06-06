@@ -2,7 +2,7 @@
 
 ### Unreleased
 
-This version drops support for Node versions below 12.
+This version drops support for Node versions below 14.
 
 ### v7.0.0
 
