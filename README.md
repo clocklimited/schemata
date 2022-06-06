@@ -1,8 +1,7 @@
 # @clocklimited/schemata - Define, create, and validate objects from a simple schema.
 
-[![NPM Details](https://nodei.co/npm/schemata.png?stars&downloads)](https://npmjs.org/package/schemata)
-
-[![Build Status](https://api.travis-ci.org/serby/schemata.svg?branch=master)](http://travis-ci.org/serby/schemata)
+[![NPM Details](https://nodei.co/npm/@clocklimited/schemata.png?stars&downloads)](https://npmjs.org/package/@clocklimited/schemata)
+[![CircleCI](https://circleci.com/gh/clocklimited/schemata/tree/master.svg?style=svg)](https://circleci.com/gh/clocklimited/schemata/tree/master)
 [![NPM version](https://img.shields.io/npm/v/@clocklimited/schemata.svg)](https://www.npmjs.com/package/@clocklimited/schemata)
 
 schemata allows you to define schemas to ensure your objects are well formed.
