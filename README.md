@@ -230,6 +230,53 @@ console.log(address.propertyName('addressLine3'))
 // Returns 'Town' because there is a name set
 ```
 
+### Schema extension
+
+You can compose schema instances to create extensions:
+
+```js
+const schemata = require('schemata')
+
+const animal = schemata({
+  name: 'Animal',
+  description: 'An animal',
+  properties: {
+    numberOfLegs: {
+      type: Number
+    }
+  }
+})
+
+const cat = animal.extends(
+  schemata({
+    name: 'Cat',
+    description: 'A cat',
+    properties: {
+      noseIsWet: {
+        type: Boolean
+      }
+    }
+  })
+)
+```
+
+Cat now looks like:
+
+```
+schemata({
+  name: 'Cat',
+  description: 'A cat',
+  properties: {
+    numberOfLegs: {
+      type: Number
+    },
+    noseIsWet: {
+      type: Boolean
+    }
+  }
+})
+```
+
 ## Credits
 
 [Paul Serby](https://github.com/serby/) follow me on twitter [@serby](http://twitter.com/serby)

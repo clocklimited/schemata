@@ -235,6 +235,20 @@ const createSchemata = ({ name, description, properties } = {}) => {
       return internalSchema[property].name === undefined
         ? convertCamelcaseToHuman(property)
         : internalSchema[property].name
+    },
+
+    /*
+     * Extend a schema with another one. Returns a new schemata instance with combined properties.
+     */
+    extend(schema) {
+      return createSchemata({
+        name: schema.getName() || this.getName(),
+        description: schema.getDescription() || this.getDescription(),
+        properties: {
+          ...this.getProperties(),
+          ...schema.getProperties()
+        }
+      })
     }
   }
 }

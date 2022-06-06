@@ -2,7 +2,8 @@
 
 ### Unreleased
 
-This version drops support for Node versions below 14.
+ - You can now extend schemata instances as much as you please using schemata.extend.
+ - This version drops support for Node versions below 14.
 
 ### v7.0.0
 

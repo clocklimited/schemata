@@ -65,4 +65,156 @@ describe('#schema', () => {
       })
     })
   })
+
+  describe('#extend', () => {
+    it('should inherit name from newSchema', () => {
+      const schema = schemata({ name: 'Person' })
+      const newSchema = schemata({
+        name: 'New Person'
+      })
+      const extendedSchema = schema.extend(newSchema)
+      assert.strictEqual(extendedSchema.getName(), 'New Person')
+      assert.strictEqual(schema.getName(), 'Person', 'Original schema modified')
+      assert.strictEqual(
+        newSchema.getName(),
+        'New Person',
+        'New schema modified'
+      )
+    })
+
+    it('should inherit description from newSchema', () => {
+      const schema = schemata({
+        name: 'Person',
+        description: 'A regular person'
+      })
+      const newSchema = schemata({
+        name: 'New Person',
+        description: 'A brand spanking new person'
+      })
+      const extendedSchema = schema.extend(newSchema)
+      assert.strictEqual(
+        extendedSchema.getDescription(),
+        'A brand spanking new person'
+      )
+      assert.strictEqual(
+        schema.getDescription(),
+        'A regular person',
+        'Original schema modified'
+      )
+      assert.strictEqual(
+        newSchema.getDescription(),
+        'A brand spanking new person',
+        'New schema modified'
+      )
+    })
+
+    it('should inherit properties from newSchema', () => {
+      const schema = schemata({
+        name: 'Person',
+        properties: {
+          name: {
+            type: String
+          }
+        }
+      })
+      const newSchema = schemata({
+        name: 'New Person',
+        properties: {
+          isHungry: {
+            type: Boolean,
+            defaultValue: true
+          }
+        }
+      })
+      const extendedSchema = schema.extend(newSchema)
+      assert.deepStrictEqual(extendedSchema.getProperties(), {
+        isHungry: {
+          defaultValue: true,
+          type: Boolean
+        },
+        name: {
+          type: String
+        }
+      })
+      assert.deepStrictEqual(
+        Object.keys(schema.getProperties()),
+        ['name'],
+        'Original schema modified'
+      )
+      assert.deepStrictEqual(
+        Object.keys(newSchema.getProperties()),
+        ['isHungry'],
+        'New schema modified'
+      )
+    })
+
+    it('should inherit properties from newSchema with overrides', () => {
+      const schema = schemata({
+        name: 'Person',
+        properties: {
+          name: {
+            type: String
+          }
+        }
+      })
+      const newSchema = schemata({
+        name: 'New Person',
+        properties: {
+          name: {
+            type: String,
+            defaultValue: 'blue'
+          },
+          isHungry: {
+            type: Boolean,
+            defaultValue: true
+          }
+        }
+      })
+      const extendedSchema = schema.extend(newSchema)
+      assert.deepStrictEqual(extendedSchema.getProperties(), {
+        isHungry: {
+          defaultValue: true,
+          type: Boolean
+        },
+        name: {
+          defaultValue: 'blue',
+          type: String
+        }
+      })
+    })
+
+    it('should be chainable', () => {
+      const schema = schemata({
+        name: 'Person',
+        properties: {
+          name: {
+            type: String
+          }
+        }
+      })
+      const newSchema = schemata({
+        name: 'New Person',
+        properties: {
+          name: {
+            type: String,
+            defaultValue: 'blue'
+          },
+          isHungry: {
+            type: Boolean,
+            defaultValue: true
+          }
+        }
+      })
+      const extendedSchema = schema.extend(newSchema).extend(schema)
+      assert.deepStrictEqual(extendedSchema.getProperties(), {
+        isHungry: {
+          defaultValue: true,
+          type: Boolean
+        },
+        name: {
+          type: String
+        }
+      })
+    })
+  })
 })
