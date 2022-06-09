@@ -5,7 +5,7 @@
  - Validator cadence has changed. Now, if you provide validators as an array, these will ALWAYS be run when validating against a specific validation set.
      Beforehand, the following was valid:
 
-     ```js
+```js
 const schemata = require('schemata')
 const required = require('validity-required')
 
@@ -29,14 +29,14 @@ const animal = schemata({
 const errors = await animal.validate({ numberOfGills: 2 }, 'aquatic')
 // errors = {}
 
-     ```
+```
 
-     With the new version, `.all` and `[]` _are_ functionally equivalent and behave as expected, so you would encounter:
+With the new version, `.all` and `[]` _are_ functionally equivalent and behave as expected, so you would encounter:
 
-     ```js
+```js
 const errors = await animal.validate({ numberOfGills: 2 }, 'aquatic')
 // errors = { numberOfLegs: 'Number of legs is required' }
-     ```
+```
 
  - There is additional support for a `default` validator. This is now the set that is validated against when no set is passed (previously `all`). This is used to provide a set of validators to run if a specific set does not match.
 
