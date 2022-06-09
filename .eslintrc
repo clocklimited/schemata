@@ -7,7 +7,6 @@
     "plugin:import/recommended"
   ],
   "rules": {
-    "promise/no-callback-in-promise": "off"
   },
   "env": {
     "es6": true,
