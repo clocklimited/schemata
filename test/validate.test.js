@@ -124,6 +124,42 @@ describe('#validate()', () => {
     )
   })
 
+  it('uses the [default] set by default if no set matches', (done) => {
+    const properties = createContactSchema().getProperties()
+    assert.deepStrictEqual(properties.name.validators, undefined)
+    properties.name.validators = {
+      default: [required]
+    }
+    const schema = createNamedSchemata(properties)
+
+    schema.validate(
+      schema.makeDefault({ name: '' }),
+      'i-dont-exist',
+      (ignoreError, errors) => {
+        assert.deepStrictEqual(errors, { name: 'Full Name is required' })
+        done()
+      }
+    )
+  })
+
+  it('uses the [all] set if no set matches', (done) => {
+    const properties = createContactSchema().getProperties()
+    assert.deepStrictEqual(properties.name.validators, undefined)
+    properties.name.validators = {
+      all: [required]
+    }
+    const schema = createNamedSchemata(properties)
+
+    schema.validate(
+      schema.makeDefault({ name: '' }),
+      'i-dont-exist',
+      (ignoreError, errors) => {
+        assert.deepStrictEqual(errors, { name: 'Full Name is required' })
+        done()
+      }
+    )
+  })
+
   it('returns error for missing property but not for valid property', (done) => {
     const properties = createContactSchema().getProperties()
     assert.deepStrictEqual(properties.name.validators, undefined)
@@ -238,7 +274,7 @@ describe('#validate()', () => {
     })
   })
 
-  it('uses the [all] set shorthand by default', (done) => {
+  it('uses the [default] set shorthand by default', (done) => {
     const properties = createContactSchema().getProperties()
     assert.deepStrictEqual(properties.name.validators, undefined)
     properties.name.validators = [required]
@@ -257,7 +293,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('uses the [all] set by default with validation set', (done) => {
+  it('uses the [default] set by default with validation set', (done) => {
     const properties = createContactSchema().getProperties()
     assert.deepStrictEqual(properties.name.validators, undefined)
     properties.name.validators = {
@@ -281,7 +317,7 @@ describe('#validate()', () => {
     )
   })
 
-  it('uses the [all] set shorthand by default with validation set', (done) => {
+  it('uses the [default] set shorthand by default with validation set', (done) => {
     const properties = createContactSchema().getProperties()
     assert.deepStrictEqual(properties.name.validators, undefined)
     properties.name.validators = [required]
@@ -297,6 +333,29 @@ describe('#validate()', () => {
         assert.deepStrictEqual(errors, {
           name: 'Full Name is required',
           age: 'Age is required'
+        })
+        done()
+      }
+    )
+  })
+
+  it('uses the [all] set with validation set', (done) => {
+    const properties = createContactSchema().getProperties()
+    assert.deepStrictEqual(properties.name.validators, undefined)
+    properties.name.validators = [required]
+    properties.age.validators = {
+      all: [required],
+      test: [length(10, 20)]
+    }
+    const schema = createNamedSchemata(properties)
+
+    schema.validate(
+      schema.makeDefault({ name: '', age: '1' }),
+      'test',
+      (ignoreError, errors) => {
+        assert.deepStrictEqual(errors, {
+          name: 'Full Name is required',
+          age: 'Age must be between 10 and 20 in length'
         })
         done()
       }

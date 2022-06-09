@@ -38,6 +38,8 @@ const errors = await animal.validate({ numberOfGills: 2 }, 'aquatic')
 // errors = { numberOfLegs: 'Number of legs is required' }
      ```
 
+ - There is additional support for a `default` validator. This is now the set that is validated against when no set is passed (previously `all`). This is used to provide a set of validators to run if a specific set does not match.
+
  - You can now extend schemata instances as much as you please using schemata.extend.
  - This version drops support for Node versions below 14.
 
