@@ -14,7 +14,8 @@ the module within your application whether you are storing your objects or not.
 ## Installation
 
 ```
-npm install schemata
+yarn add @clocklimited/schemata
+npm install -S @clocklimited/schemata
 ```
 
 ## Usage
@@ -55,7 +56,7 @@ const contactSchema = schemata({
 - **type**: (optional) The javascript type that the property value will be coerced into via the **cast()** and **castProperty()** functions. If this is omitted the property will be of type String. Type can be any of the following: String, Number, Boolean, Array, Object, Date or another instance of a schemata schema.
 - **defaultValue**: (optional) The property value return when using **makeDefault()** If this is a function, it will be the return value.
 - **tag[]**: (optional) Some functions such as **cast()** and **stripUnknownProperties()** take a tag option. If this is passed then only properties with that tag are processed.
-- **validators{}**: (optional) A object containing all the validator set for this property. By default the validator set 'all' will be used by **validate()**. schemata gives you the ability defined any number of validator sets, so you can validate an object in different ways. Since 3.1, if you only want one set of validators you can set `.validators = [ validatorA, validatorB ]` as a shorthand. Since 4.0.0 you can also omit the callback and provide a promise.
+- **validators{}**: (optional) A object containing all the validator set for this property. By default the validator set 'default' will be used by **validate()**. schemata gives you the ability to define any number of validator sets, so you can validate an object in different ways. Since 3.1, if you only want one set of validators you can set `.validators = [ validatorA, validatorB ]` as a shorthand. Since 4.0.0 you can also omit the callback and provide a promise.
 
 ### Creating a new object
 
@@ -146,6 +147,85 @@ If any of the validators fail then the errors will be returned in the callback f
 
 For a comprehensive set of validators including: email, integer, string length, required & UK postcode. Check out [validity](https://github.com/serby/validity).
 
+#### 'all' + 'default' sets
+
+Since v8.0.0, the default validator set if none matches (or if you use the shorthand) is the 'default' set.
+
+If you provide an object, you can also use the 'all' validator set and it will run as well as a more specific set.
+
+
+To see the final property validators:
+
+| Input Validators | Set | Output Validators |
+|------------------|-----|-------------------|
+| [required, length] | not provided | [required, length] |
+| [required, length] | `'all'` | [required, length] |
+| [required, length] | any | [required, length] |
+| { default: [required], all: [length] } | not provided | [required, length] |
+| { default: [required], all: [length] } | `'all'` | [length] |
+| { default: [required], all: [length] } | any | [required, length] |
+| { default: [required], all: [length], other: [isBoolean] } | any | [required, length] |
+| { default: [required], all: [length], other: [isBoolean] } | `'other'` | [length, isBoolean] |
+
+Usage examples:
+
+```js
+const schemata = require('schemata')
+const required = require('validity-required')
+
+const animal = schemata({
+  name: 'Animal',
+  description: 'An animal',
+  properties: {
+    numberOfLegs: {
+      type: Number,
+      validators: [required]
+    },
+    numberOfGills: {
+      type: Number,
+      validators: {
+        default: [],
+        aquatic: [required]
+      }
+    }
+  }
+})
+
+const errors = await animal.validate({ numberOfGills: 2 }, 'aquatic')
+// errors = { numberOfLegs: 'Number of legs is required' }
+```
+
+```js
+const schemata = require('schemata')
+const required = require('validity-required')
+
+const animal = schemata({
+  name: 'Animal',
+  description: 'An animal',
+  properties: {
+    numberOfLegs: {
+      type: Number,
+      validators: {
+        all: [required]
+      }
+    },
+    numberOfGills: {
+      type: Number,
+      validators: {
+        default: [required],
+        aquatic: []
+      }
+    }
+  }
+})
+
+const errors = await animal.validate({}, 'aquatic')
+// errors = {
+//  numberOfLegs: 'Number of legs is required',
+// }
+// Note the absence of "numberOfGills" validation error above!
+```
+
 ### Cast an object to the types defined in the schema
 
 Type casting is done in schemata using the **cast()** and **castProperty()** functions. **cast()** is used for when you want to cast multiple properties against a schema, **castProperty()** is used if you want to cast one property and explicitly provide the type.
@@ -228,6 +308,53 @@ console.log(address.propertyName('addressLine1'))
 
 console.log(address.propertyName('addressLine3'))
 // Returns 'Town' because there is a name set
+```
+
+### Schema extension
+
+You can compose schema instances to create extensions:
+
+```js
+const schemata = require('schemata')
+
+const animal = schemata({
+  name: 'Animal',
+  description: 'An animal',
+  properties: {
+    numberOfLegs: {
+      type: Number
+    }
+  }
+})
+
+const cat = animal.extends(
+  schemata({
+    name: 'Cat',
+    description: 'A cat',
+    properties: {
+      noseIsWet: {
+        type: Boolean
+      }
+    }
+  })
+)
+```
+
+Cat now looks like:
+
+```
+schemata({
+  name: 'Cat',
+  description: 'A cat',
+  properties: {
+    numberOfLegs: {
+      type: Number
+    },
+    noseIsWet: {
+      type: Boolean
+    }
+  }
+})
 ```
 
 ## Credits
