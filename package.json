@@ -53,7 +53,7 @@
   "repository": "git://github.com/clocklimited/schemata.git",
   "main": "./dist/schemata.js",
   "files": [
-    "./dist"
+    "dist"
   ],
   "scripts": {
     "lint:js": "eslint . -f unix --cache --ext '.js'",
