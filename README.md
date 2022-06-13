@@ -23,7 +23,7 @@ npm install -S @clocklimited/schemata
 ### Creating a basic schema
 
 ```js
-const schemata = require('schemata')
+const schemata = require('@clocklimited/schemata')
 
 const contactSchema = schemata({
   name: 'Contact',
@@ -170,7 +170,7 @@ To see the final property validators:
 Usage examples:
 
 ```js
-const schemata = require('schemata')
+const schemata = require('@clocklimited/schemata')
 const required = require('validity-required')
 
 const animal = schemata({
@@ -196,7 +196,7 @@ const errors = await animal.validate({ numberOfGills: 2 }, 'aquatic')
 ```
 
 ```js
-const schemata = require('schemata')
+const schemata = require('@clocklimited/schemata')
 const required = require('validity-required')
 
 const animal = schemata({
@@ -231,7 +231,7 @@ const errors = await animal.validate({}, 'aquatic')
 Type casting is done in schemata using the **cast()** and **castProperty()** functions. **cast()** is used for when you want to cast multiple properties against a schema, **castProperty()** is used if you want to cast one property and explicitly provide the type.
 
 ```js
-const schemata = require('schemata')
+const schemata = require('@clocklimited/schemata')
 
 const person = schemata({
   name: 'Person',
@@ -286,7 +286,7 @@ If you want to output the name of a schema property in a human-readable format t
 Consider the following example:
 
 ```js
-const schemata = require('schemata')
+const schemata = require('@clocklimited/schemata')
 
 const address = schemata({
   name: 'Address',
@@ -315,7 +315,7 @@ console.log(address.propertyName('addressLine3'))
 You can compose schema instances to create extensions:
 
 ```js
-const schemata = require('schemata')
+const schemata = require('@clocklimited/schemata')
 
 const animal = schemata({
   name: 'Animal',
