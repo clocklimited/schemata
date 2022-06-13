@@ -1,6 +1,6 @@
 # Changelog
 
-### Unreleased
+### v8.0.0
 
  - Validator cadence has changed. Now, if you provide validators as an array, these will ALWAYS be run when validating against a specific validation set.
      Beforehand, the following was valid:
