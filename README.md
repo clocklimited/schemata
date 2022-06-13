@@ -1,12 +1,8 @@
-# schemata - Define, create, and validate objects from a simple schema.
+# @clocklimited/schemata - Define, create, and validate objects from a simple schema.
 
-[![NPM Details](https://nodei.co/npm/schemata.png?stars&downloads)](https://npmjs.org/package/schemata)
-
-[![Build Status](https://api.travis-ci.org/serby/schemata.svg?branch=master)](http://travis-ci.org/serby/schemata)
-[![Coverage Status](https://img.shields.io/coveralls/serby/schemata/master.svg?style=flat)](https://coveralls.io/r/serby/schemata?branch=master)
-[![Dependency Status](https://img.shields.io/david/serby/schemata.svg)](https://david-dm.org/serby/schemata)
-[![NPM version](https://img.shields.io/npm/v/schemata.svg)](https://www.npmjs.com/package/throat)
-[![Greenkeeper badge](https://badges.greenkeeper.io/serby/schemata.svg)](https://greenkeeper.io/)
+[![NPM Details](https://nodei.co/npm/@clocklimited/schemata.png?stars&downloads)](https://npmjs.org/package/@clocklimited/schemata)
+[![CircleCI](https://circleci.com/gh/clocklimited/schemata/tree/master.svg?style=svg)](https://circleci.com/gh/clocklimited/schemata/tree/master)
+[![NPM version](https://img.shields.io/npm/v/@clocklimited/schemata.svg)](https://www.npmjs.com/package/@clocklimited/schemata)
 
 schemata allows you to define schemas to ensure your objects are well formed.
 This is similar to the concept of a schema in [mongoose](http://mongoosejs.com/)
@@ -14,79 +10,13 @@ but unlike mongoose schemata has nothing to do with data persistence. This
 lightweight decoupled approach gives the ultimate flexibility and freedom to use
 the module within your application whether you are storing your objects or not.
 
-## Changelog
-
-### v7.0.0
-
-This should be compatible with v6 but has some major rewrites, hence the version bump.
-
-You can now validate using regular functions, promises and the old style callback.
-
-```js
-const databaseLookup = async () => null
-
-// Regular function
-const isOfWizardingAge = (propertyName, name, entity) =>
-  entity[propertyName] < 17 && 'Sorry you are not of age'
-
-// Promise
-const isUniqueAge = async (propertyName, name, entity) => {
-  const found = await databaseLookup({ age: entity[propertyName] })
-  if (found) return `${entity[propertyName]} already exists`
-}
-
-const properties = createContactSchema().getProperties()
-properties.age.validators = [
-  isOfWizardingAge,
-  isUniqueAge,
-  (propertyName, name, object, cb) =>
-    cb(null, `${propertyName} ${name} ${object[propertyName]}`)
-]
-const schema = createNamedSchemata(properties)
-const errors = await schema.validate(
-  schema.makeDefault({ name: 'Paul', age: 16 })
-)
-console.error(errors)
-```
-
-This version is the first to be transpiled using babel and with `async.js` removed.
-
-### v6.0.0
-
-Moves `castProperty` to a static function.
-
-### v5.0.0
-
-The main initialization arguments have now changed so you must provide a `name`
-and can also provide a `description`. The schema definition is now set via the
-`properties` property.
-
-### v4.1.0
-
-Validate now return a promise if a callback is not provided.
-
-### v4.0.0
-
-Node 6+ upgrade. Direct access to the schema has been removed (`schema.schema`) and `getProperties()` must now be used.
-
-### v3.2.0
-
-- Introduces shorthand for `schema.validators.all = []`. Now `schema.validators = []` is equivalent.
-
-### v3.1.0
-
-- Fixed a bug where `stripUnknownProperties()` was not stripping out properties of type array that were null.
-
-### v3.0.0
-
-This version prevents you from using arrays and objects for `defaultValue`. Now
-only primitives and functions are allowed. If you are not doing this in your
-project then you can safely upgrade from v2. See
-https://github.com/serby/schemata/pull/34 for more details.
 
 ## Installation
 
-    npm install schemata
+```
+yarn add @clocklimited/schemata
+npm install -S @clocklimited/schemata
+```
 
 ## Usage
 
@@ -122,11 +52,11 @@ const contactSchema = schemata({
 
 #### Schema Properties
 
-- **name**: (optional) The friendly version of the property name. If omitted a decamlcased version of the property name will be used.
+- **name**: (optional) The friendly version of the property name. If omitted a decamelcased version of the property name will be used.
 - **type**: (optional) The javascript type that the property value will be coerced into via the **cast()** and **castProperty()** functions. If this is omitted the property will be of type String. Type can be any of the following: String, Number, Boolean, Array, Object, Date or another instance of a schemata schema.
 - **defaultValue**: (optional) The property value return when using **makeDefault()** If this is a function, it will be the return value.
 - **tag[]**: (optional) Some functions such as **cast()** and **stripUnknownProperties()** take a tag option. If this is passed then only properties with that tag are processed.
-- **validators{}**: (optional) A object containing all the validator set for this property. By default the validator set 'all' will be used by **validate()**. schemata gives you the ability defined any number of validator sets, so you can validate an object in different ways. Since 3.1, if you only want one set of validators you can set `.validators = [ validatorA, validatorB ]` as a shorthand. Since 4.0.0 you can also omit the callback and provide a promise.
+- **validators{}**: (optional) A object containing all the validator set for this property. By default the validator set 'default' will be used by **validate()**. schemata gives you the ability to define any number of validator sets, so you can validate an object in different ways. Since 3.1, if you only want one set of validators you can set `.validators = [ validatorA, validatorB ]` as a shorthand. Since 4.0.0 you can also omit the callback and provide a promise.
 
 ### Creating a new object
 
@@ -178,7 +108,8 @@ Validation is easy in schemata, just call **validate()** on your schema passing 
 
 ```js
 contactSchema.validate(objectToValidate, function(error, errors) {
-  // errors
+  // error = fatal error occured in a validator
+  // errors = validation errors object
 })
 ```
 
@@ -215,6 +146,85 @@ name: {
 If any of the validators fail then the errors will be returned in the callback from **validate()** with the object key being the field name and the value being the error message.
 
 For a comprehensive set of validators including: email, integer, string length, required & UK postcode. Check out [validity](https://github.com/serby/validity).
+
+#### 'all' + 'default' sets
+
+Since v8.0.0, the default validator set if none matches (or if you use the shorthand) is the 'default' set.
+
+If you provide an object, you can also use the 'all' validator set and it will run as well as a more specific set.
+
+
+To see the final property validators:
+
+| Input Validators | Set | Output Validators |
+|------------------|-----|-------------------|
+| [required, length] | not provided | [required, length] |
+| [required, length] | `'all'` | [required, length] |
+| [required, length] | any | [required, length] |
+| { default: [required], all: [length] } | not provided | [required, length] |
+| { default: [required], all: [length] } | `'all'` | [length] |
+| { default: [required], all: [length] } | any | [required, length] |
+| { default: [required], all: [length], other: [isBoolean] } | any | [required, length] |
+| { default: [required], all: [length], other: [isBoolean] } | `'other'` | [length, isBoolean] |
+
+Usage examples:
+
+```js
+const schemata = require('schemata')
+const required = require('validity-required')
+
+const animal = schemata({
+  name: 'Animal',
+  description: 'An animal',
+  properties: {
+    numberOfLegs: {
+      type: Number,
+      validators: [required]
+    },
+    numberOfGills: {
+      type: Number,
+      validators: {
+        default: [],
+        aquatic: [required]
+      }
+    }
+  }
+})
+
+const errors = await animal.validate({ numberOfGills: 2 }, 'aquatic')
+// errors = { numberOfLegs: 'Number of legs is required' }
+```
+
+```js
+const schemata = require('schemata')
+const required = require('validity-required')
+
+const animal = schemata({
+  name: 'Animal',
+  description: 'An animal',
+  properties: {
+    numberOfLegs: {
+      type: Number,
+      validators: {
+        all: [required]
+      }
+    },
+    numberOfGills: {
+      type: Number,
+      validators: {
+        default: [required],
+        aquatic: []
+      }
+    }
+  }
+})
+
+const errors = await animal.validate({}, 'aquatic')
+// errors = {
+//  numberOfLegs: 'Number of legs is required',
+// }
+// Note the absence of "numberOfGills" validation error above!
+```
 
 ### Cast an object to the types defined in the schema
 
@@ -300,9 +310,58 @@ console.log(address.propertyName('addressLine3'))
 // Returns 'Town' because there is a name set
 ```
 
+### Schema extension
+
+You can compose schema instances to create extensions:
+
+```js
+const schemata = require('schemata')
+
+const animal = schemata({
+  name: 'Animal',
+  description: 'An animal',
+  properties: {
+    numberOfLegs: {
+      type: Number
+    }
+  }
+})
+
+const cat = animal.extends(
+  schemata({
+    name: 'Cat',
+    description: 'A cat',
+    properties: {
+      noseIsWet: {
+        type: Boolean
+      }
+    }
+  })
+)
+```
+
+Cat now looks like:
+
+```
+schemata({
+  name: 'Cat',
+  description: 'A cat',
+  properties: {
+    numberOfLegs: {
+      type: Number
+    },
+    noseIsWet: {
+      type: Boolean
+    }
+  }
+})
+```
+
 ## Credits
 
 [Paul Serby](https://github.com/serby/) follow me on twitter [@serby](http://twitter.com/serby)
+
+[Clock Limited](https://github.com/clocklimted/) follow us on twitter [@clock](http://twitter.com/clock)
 
 [Dom Harrington](https://github.com/domharrington/)
 

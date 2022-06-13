@@ -1,72 +1,18 @@
 const isPrimitive = require('is-primitive')
 const clone = require('lodash.clonedeep')
 const SchemataArray = require('./lib/array')
+const castProperty = require('./lib/property-caster')
 const hasTag = require('./lib/has-tag')
 const isSchemata = require('./lib/is-schemata')
 const isSchemataArray = require('./lib/is-array')
 const getType = require('./lib/type-getter')
-const castArray = require('./lib/casters/array')
-const castBoolean = require('./lib/casters/boolean')
-const castDate = require('./lib/casters/date')
-const castNumber = require('./lib/casters/number')
-const castObject = require('./lib/casters/object')
-const castString = require('./lib/casters/string')
 const { validate, validateRecursive } = require('./lib/validate')
 const convertCamelcaseToHuman = require('./lib/camelcase-to-human-converter')
-/**
- * Casts a value to a given type.
- *
- * For booleans and integers; undefined, '', and null will all be cast to null
- * For array they will be converted to []
- * For object they will be converted to {}
- *
- * Throws error if type is undefined.
- *
- */
-const castProperty = (type, value, key, entityObject) => {
-  if (type === undefined) throw new Error('Missing type')
-
-  // First check whether the type of this property is
-  // a sub-schema, or an array of sub-schemas
-
-  const subSchema = getType(type, entityObject)
-  if (isSchemata(subSchema)) {
-    return value !== null ? subSchema.cast(value) : null
-  }
-
-  if (isSchemataArray(type)) {
-    if (!value) return null
-    if (!Array.isArray(value)) value = [value]
-    return value.map(v => type.arraySchema.cast(v))
-  }
-
-  // If the { type: x } is a primitive constructor, use
-  // cast the value based on which constructor is found
-
-  // JSHint doesn't like switch statements!
-  /* jshint maxcomplexity: 13 */
-  switch (type) {
-    case Boolean:
-      return castBoolean(value)
-    case Number:
-      return castNumber(value)
-    case String:
-      return castString(value)
-    case Object:
-      return castObject(value)
-    case Date:
-      return castDate(value)
-    case Array:
-      return castArray(value)
-    default:
-      return value
-  }
-}
 
 const createSchemata = ({ name, description, properties } = {}) => {
   if (name === undefined) throw new Error('name is required')
   const internalSchema = clone(properties || {})
-  Object.keys(internalSchema).forEach(k => {
+  Object.keys(internalSchema).forEach((k) => {
     if (!properties[k].defaultValue) return
     if (typeof properties[k].defaultValue === 'function') return
     if (isPrimitive(properties[k].defaultValue)) return
@@ -98,7 +44,7 @@ const createSchemata = ({ name, description, properties } = {}) => {
     makeBlank() {
       const newEntity = {}
 
-      Object.keys(internalSchema).forEach(key => {
+      Object.keys(internalSchema).forEach((key) => {
         const type = getType(internalSchema[key].type)
 
         if (typeof type === 'object') {
@@ -141,7 +87,7 @@ const createSchemata = ({ name, description, properties } = {}) => {
 
       if (!existingEntity) existingEntity = {}
 
-      Object.keys(internalSchema).forEach(key => {
+      Object.keys(internalSchema).forEach((key) => {
         const property = internalSchema[key]
         const existingValue = existingEntity[key]
         const type = getType(property.type, existingEntity)
@@ -187,11 +133,9 @@ const createSchemata = ({ name, description, properties } = {}) => {
      * then only properties with that tag will remain.
      */
     stripUnknownProperties(entityObject, tag, ignoreTagForSubSchemas) {
-      /* jshint maxcomplexity: 10 */
-
       const newEntity = {}
 
-      Object.keys(entityObject).forEach(key => {
+      Object.keys(entityObject).forEach((key) => {
         const property = internalSchema[key]
         let subSchemaTag
 
@@ -238,13 +182,12 @@ const createSchemata = ({ name, description, properties } = {}) => {
 
           subSchemaTag = ignoreTagForSubSchemas ? undefined : tag
           entityObject[key].forEach((item, index) => {
-            newEntity[key][
-              index
-            ] = property.type.arraySchema.stripUnknownProperties(
-              item,
-              subSchemaTag,
-              ignoreTagForSubSchemas
-            )
+            newEntity[key][index] =
+              property.type.arraySchema.stripUnknownProperties(
+                item,
+                subSchemaTag,
+                ignoreTagForSubSchemas
+              )
           })
         }
       })
@@ -259,7 +202,7 @@ const createSchemata = ({ name, description, properties } = {}) => {
     cast(entityObject, tag) {
       const newEntity = {}
 
-      Object.keys(entityObject).forEach(key => {
+      Object.keys(entityObject).forEach((key) => {
         // Copy all properties
         newEntity[key] = entityObject[key]
 
@@ -292,6 +235,20 @@ const createSchemata = ({ name, description, properties } = {}) => {
       return internalSchema[property].name === undefined
         ? convertCamelcaseToHuman(property)
         : internalSchema[property].name
+    },
+
+    /*
+     * Extend a schema with another one. Returns a new schemata instance with combined properties.
+     */
+    extend(schema) {
+      return createSchemata({
+        name: schema.getName() || this.getName(),
+        description: schema.getDescription() || this.getDescription(),
+        properties: {
+          ...this.getProperties(),
+          ...schema.getProperties()
+        }
+      })
     }
   }
 }

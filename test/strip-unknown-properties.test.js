@@ -76,7 +76,7 @@ describe('#stripUnknownProperties()', () => {
     const schema = createBlogSchema()
     const obj = { author: { name: 'Paul', extra: 'Not here' } }
 
-    schema.getProperties().author.type = model => {
+    schema.getProperties().author.type = (model) => {
       assert.deepdeepStrictEqual(model, obj)
       return createContactSchema()
     }

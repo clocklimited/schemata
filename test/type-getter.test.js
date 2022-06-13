@@ -16,7 +16,7 @@ describe('#getType()', () => {
   it('should call the function with the model if provided', () => {
     const model = { a: 1 }
     const schema = schemata({ name: 'Person' })
-    const type = m => {
+    const type = (m) => {
       assert.deepStrictEqual(m, model)
       return schema
     }
