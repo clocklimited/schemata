@@ -1,7 +1,7 @@
 const expectedInterface = ['makeBlank', 'makeDefault', 'getName', 'validate']
 const isSchemata = (obj) => {
-  // Schemata instances must be objects
-  if (typeof obj !== 'object') return false
+  // Schemata instances must be functions
+  if (typeof obj !== 'function') return false
   return expectedInterface.every((func) => obj[func] !== undefined)
 }
 

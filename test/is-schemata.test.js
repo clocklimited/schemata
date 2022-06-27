@@ -1,5 +1,5 @@
-const schemata = require('../schemata')
-const isSchemata = require('../lib/is-schemata')
+const schemata = require('../src/schemata')
+const isSchemata = require('../src/lib/is-schemata')
 const assert = require('assert')
 
 describe('#isSchemata()', () => {

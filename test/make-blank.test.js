@@ -1,5 +1,5 @@
 const assert = require('assert')
-const schemata = require('../schemata')
+const schemata = require('../src/schemata')
 const helpers = require('./helpers')
 const createContactSchema = helpers.createContactSchema
 const createBlogSchema = helpers.createBlogSchema

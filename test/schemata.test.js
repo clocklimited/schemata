@@ -1,6 +1,6 @@
-const schemata = require('../schemata')
-const SchemataArray = require('../lib/array')
-const castProperty = require('../lib/property-caster')
+const schemata = require('../src/schemata')
+const SchemataArray = require('../src/lib/array')
+const castProperty = require('../src/lib/property-caster')
 const assert = require('assert')
 
 describe('schemata', () => {

@@ -1,6 +1,6 @@
 const assert = require('assert')
 const async = require('async')
-const schemata = require('../schemata')
+const schemata = require('../src/schemata')
 const {
   createContactSchema,
   createBlogSchema,
@@ -745,10 +745,12 @@ describe('#validate()', () => {
   })
   it('should allow promise validators', async () => {
     const properties = createContactSchema().getProperties()
-    properties.name.validators = [
-      async (propertyName, name, object) =>
+    async function validatePromise(propertyName, name, object) {
+      return await Promise.resolve(
         `${propertyName} ${name} ${object[propertyName]}`
-    ]
+      )
+    }
+    properties.name.validators = [validatePromise]
     const schema = createNamedSchemata(properties)
     const errors = await schema.validate(
       schema.makeDefault({ name: 'Paul' }),

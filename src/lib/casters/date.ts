@@ -1,4 +1,4 @@
-function castDate(value) {
+function castDate(value: any): Date {
   return value === '' || value === null || value === undefined
     ? null
     : value instanceof Date

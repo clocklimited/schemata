@@ -1,4 +1,4 @@
-const schemata = require('../schemata')
+import schemata from '../src/schemata'
 
 const createContactSchema = () => {
   return schemata({
@@ -26,12 +26,31 @@ const createContactSchema = () => {
   })
 }
 
+const createCommentSchema = () => {
+  return schemata({
+    name: 'Comment',
+    properties: {
+      email: {},
+      comment: {
+        tag: ['auto']
+      },
+      created: {
+        type: Date
+      }
+    }
+  })
+}
+
+const { age, phoneNumber, dateOfBirth, active } =
+  createContactSchema().makeDefault()
+
 const createBlogSchema = () => {
   return schemata({
     name: 'Blog',
     properties: {
       title: {
-        tag: ['auto']
+        tag: ['auto'],
+        type: String
       },
       body: {
         tag: ['auto']
@@ -47,20 +66,21 @@ const createBlogSchema = () => {
   })
 }
 
-const createCommentSchema = () => {
-  return schemata({
-    name: 'Comment',
+const { author, comments, body } = createBlogSchema().makeDefault()
+
+const extended = createBlogSchema().extend(
+  schemata({
+    name: 'Bar',
     properties: {
-      email: {},
-      comment: {
-        tag: ['auto']
-      },
-      created: {
-        type: Date
+      category: {
+        tag: ['auto'],
+        type: String
       }
     }
   })
-}
+)
+
+const { title, category, author: extendedAuthor } = extended.makeDefault()
 
 const createNamedSchemata = (properties) =>
   schemata({ name: 'Foo', properties })

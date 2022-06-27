@@ -1,4 +1,4 @@
-const schemata = require('../schemata')
+const schemata = require('../src/schemata')
 const assert = require('assert')
 
 describe('#schema', () => {
