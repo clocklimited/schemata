@@ -1,5 +1,5 @@
-const getType = require('../lib/type-getter')
-const schemata = require('../schemata')
+const getType = require('../src/lib/type-getter')
+const schemata = require('../src/schemata')
 const assert = require('assert')
 
 describe('#getType()', () => {

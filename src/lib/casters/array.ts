@@ -1,4 +1,4 @@
-function castArray(value) {
+function castArray(value: any): any[] {
   return value === '' || value === null || value === undefined
     ? []
     : Array.isArray(value)

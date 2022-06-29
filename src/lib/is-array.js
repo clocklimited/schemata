@@ -4,7 +4,7 @@ const isSchemata = require('./is-schemata')
  */
 const isArray = (obj) => {
   // Schemata array types must be objects
-  if (typeof obj !== 'object') return false
+  if (typeof obj !== 'function') return false
 
   // Array types look like { arraySchema: <schemata> }
   return isSchemata(obj.arraySchema)

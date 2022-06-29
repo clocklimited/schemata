@@ -4,7 +4,7 @@ const {
   createBlogSchema,
   createNamedSchemata
 } = require('./helpers')
-const { castProperty } = require('../schemata')
+const { castProperty } = require('../src/schemata')
 const castFixtures = require('./cast-fixtures')
 const assertions = castFixtures.assertions
 const typeMap = castFixtures.typeMap

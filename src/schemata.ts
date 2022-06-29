@@ -1,17 +1,29 @@
-const isPrimitive = require('is-primitive')
-const clone = require('lodash.clonedeep')
-const SchemataArray = require('./lib/array')
-const castProperty = require('./lib/property-caster')
-const hasTag = require('./lib/has-tag')
-const isSchemata = require('./lib/is-schemata')
-const isSchemataArray = require('./lib/is-array')
-const getType = require('./lib/type-getter')
-const { validate, validateRecursive } = require('./lib/validate')
-const convertCamelcaseToHuman = require('./lib/camelcase-to-human-converter')
+import isPrimitive from 'is-primitive'
+import clone from 'lodash.clonedeep'
+import SchemataArray from './lib/array'
+import castProperty from './lib/property-caster'
+import hasTag from './lib/has-tag'
+import isSchemata from './lib/is-schemata'
+import isSchemataArray from './lib/is-array'
+import getType from './lib/type-getter'
+import { validate, validateRecursive } from './lib/validate'
+import convertCamelcaseToHuman from './lib/camelcase-to-human-converter'
+import { ISchemata, Properties, SchemataType } from './lib/types'
 
-const createSchemata = ({ name, description, properties } = {}) => {
+interface SchemataConstructor<P> {
+  name: string
+  description?: string
+  properties: P
+}
+
+function createSchemata<P extends Properties>(
+  constructor: SchemataConstructor<P>
+) {
+  const { name, description, properties } = constructor || {}
+  type Type = SchemataType<typeof properties>
+
   if (name === undefined) throw new Error('name is required')
-  const internalSchema = clone(properties || {})
+  const internalSchema: P = clone(properties || {}) as P
   Object.keys(internalSchema).forEach((k) => {
     if (!properties[k].defaultValue) return
     if (typeof properties[k].defaultValue === 'function') return
@@ -21,14 +33,17 @@ const createSchemata = ({ name, description, properties } = {}) => {
     )
   })
 
-  return {
+  const obj: ISchemata<P, Type> = {
     getName() {
       return name
     },
     getDescription() {
-      return description
+      return description || ''
     },
     getProperties() {
+      return clone(internalSchema)
+    },
+    get properties() {
       return clone(internalSchema)
     },
     /*
@@ -41,25 +56,25 @@ const createSchemata = ({ name, description, properties } = {}) => {
      * - Boolean = null
      * - Number = null
      */
-    makeBlank() {
+    makeBlank(): Type {
       const newEntity = {}
 
       Object.keys(internalSchema).forEach((key) => {
         const type = getType(internalSchema[key].type)
 
+        // If the type is a schemata instance use its makeBlank() function
+        if (isSchemata(type)) {
+          newEntity[key] = type.makeBlank()
+          return null
+        }
+
+        // If the type is a schemata array, create an empty array
+        if (isSchemataArray(type)) {
+          newEntity[key] = []
+          return null
+        }
+
         if (typeof type === 'object') {
-          // If the type is a schemata instance use its makeBlank() function
-          if (isSchemata(type)) {
-            newEntity[key] = type.makeBlank()
-            return null
-          }
-
-          // If the type is a schemata array, create an empty array
-          if (isSchemataArray(type)) {
-            newEntity[key] = []
-            return null
-          }
-
           throw new Error(`Invalid property type on '${key}'`)
         }
 
@@ -82,7 +97,7 @@ const createSchemata = ({ name, description, properties } = {}) => {
      * Returns a new object with properties and default values from the schema definition.
      * If existingEntity is passed then extends it with the default properties.
      */
-    makeDefault(existingEntity) {
+    makeDefault(existingEntity?: any): Type {
       const newEntity = this.makeBlank()
 
       if (!existingEntity) existingEntity = {}
@@ -132,7 +147,11 @@ const createSchemata = ({ name, description, properties } = {}) => {
      * Takes an object and strips out properties not in the schema. If a tag is given
      * then only properties with that tag will remain.
      */
-    stripUnknownProperties(entityObject, tag, ignoreTagForSubSchemas) {
+    stripUnknownProperties(
+      entityObject,
+      tag?: string,
+      ignoreTagForSubSchemas?: boolean
+    ) {
       const newEntity = {}
 
       Object.keys(entityObject).forEach((key) => {
@@ -166,12 +185,6 @@ const createSchemata = ({ name, description, properties } = {}) => {
           return
         }
 
-        // If this property is of a primitive type, keep it as is
-        if (typeof property.type !== 'object') {
-          newEntity[key] = entityObject[key]
-          return
-        }
-
         // If the type is a schemata array, call stripUnknownProperties() on each item in the array
         if (isSchemataArray(property.type)) {
           // The array can't be processed if it's not an array
@@ -189,6 +202,13 @@ const createSchemata = ({ name, description, properties } = {}) => {
                 ignoreTagForSubSchemas
               )
           })
+
+          return
+        }
+
+        // If this property is of a primitive type, keep it as is
+        if (typeof property.type !== 'object') {
+          newEntity[key] = entityObject[key]
         }
       })
 
@@ -240,19 +260,28 @@ const createSchemata = ({ name, description, properties } = {}) => {
     /*
      * Extend a schema with another one. Returns a new schemata instance with combined properties.
      */
-    extend(schema) {
-      return createSchemata({
-        name: schema.getName() || this.getName(),
-        description: schema.getDescription() || this.getDescription(),
+    extend<Q extends Properties, T extends SchemataType<Q>>(
+      schema: ISchemata<Q, T>
+    ) {
+      type JoinedProperties = P & Q
+      const self = this as ISchemata<P, Type>
+      return createSchemata<JoinedProperties>({
+        name: schema.getName() || self.getName(),
+        description: schema.getDescription() || self.getDescription(),
         properties: {
-          ...this.getProperties(),
+          ...self.getProperties(),
           ...schema.getProperties()
         }
       })
     }
   }
+
+  return Object.assign(function () {
+    return obj.makeDefault()
+  }, obj)
 }
 
 createSchemata.Array = SchemataArray
 createSchemata.castProperty = castProperty
+export default createSchemata
 module.exports = createSchemata
