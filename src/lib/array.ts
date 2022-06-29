@@ -8,8 +8,8 @@ function ArrayType<Q extends Properties, T extends SchemataType<Q>>(
 ) {
   const schemata = 'makeDefault' in schema ? schema : schema()
 
-  const fn = function () {
-    return schemata.makeDefault()
+  const fn = function (): T[] {
+    return []
   }
 
   fn.arraySchema = schemata
