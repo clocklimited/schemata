@@ -18,3 +18,4 @@ function ArrayType<Q extends Properties, T extends SchemataType<Q>>(
 }
 
 export default ArrayType
+module.exports = ArrayType

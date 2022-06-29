@@ -49,7 +49,9 @@ export interface Property {
 }
 
 export type SchemataType<T extends Record<string, { type?: any }>> = {
-  [P in keyof T]?: ReturnType<T[P]['type']>
+  [P in keyof T]?: T[P]['type'] extends { new () }
+    ? InstanceType<T[P]['type']>
+    : ReturnType<T[P]['type']>
 }
 
 export type Properties = { [name: string]: Property }

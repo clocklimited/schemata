@@ -38,7 +38,7 @@ function createSchemata<P extends Properties>(
       return name
     },
     getDescription() {
-      return description
+      return description || ''
     },
     getProperties() {
       return clone(internalSchema)
@@ -62,19 +62,19 @@ function createSchemata<P extends Properties>(
       Object.keys(internalSchema).forEach((key) => {
         const type = getType(internalSchema[key].type)
 
+        // If the type is a schemata instance use its makeBlank() function
+        if (isSchemata(type)) {
+          newEntity[key] = type.makeBlank()
+          return null
+        }
+
+        // If the type is a schemata array, create an empty array
+        if (isSchemataArray(type)) {
+          newEntity[key] = []
+          return null
+        }
+
         if (typeof type === 'object') {
-          // If the type is a schemata instance use its makeBlank() function
-          if (isSchemata(type)) {
-            newEntity[key] = type.makeBlank()
-            return null
-          }
-
-          // If the type is a schemata array, create an empty array
-          if (isSchemataArray(type)) {
-            newEntity[key] = []
-            return null
-          }
-
           throw new Error(`Invalid property type on '${key}'`)
         }
 
@@ -185,12 +185,6 @@ function createSchemata<P extends Properties>(
           return
         }
 
-        // If this property is of a primitive type, keep it as is
-        if (typeof property.type !== 'object') {
-          newEntity[key] = entityObject[key]
-          return
-        }
-
         // If the type is a schemata array, call stripUnknownProperties() on each item in the array
         if (isSchemataArray(property.type)) {
           // The array can't be processed if it's not an array
@@ -208,6 +202,13 @@ function createSchemata<P extends Properties>(
                 ignoreTagForSubSchemas
               )
           })
+
+          return
+        }
+
+        // If this property is of a primitive type, keep it as is
+        if (typeof property.type !== 'object') {
+          newEntity[key] = entityObject[key]
         }
       })
 

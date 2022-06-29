@@ -7,31 +7,39 @@ const isSchemataArray = require('./is-array')
 const getType = require('./type-getter')
 const convertCamelcaseToHuman = require('./camelcase-to-human-converter')
 
+interface ValidateArgumentStrategy {
+  entityObject: any
+  set: string | 'default'
+  tag?: string
+  callback: ValidateFunction
+}
+
 const validateArgumentStrategies = () => {
-  function two(validateArgs) {
-    const properties = {}
+  function two(validateArgs: any[]): ValidateArgumentStrategy {
     const arg = validateArgs[1]
-    properties.entityObject = validateArgs[0]
-    properties.set = typeof arg !== 'function' ? arg : 'default'
-    properties.tag = undefined
-    properties.callback = arg
-    return properties
+    const entityObject = validateArgs[0]
+    const set = typeof arg !== 'function' ? arg : 'default'
+    const tag = undefined
+    const callback = arg
+    return { entityObject, set, tag, callback }
   }
-  function three(validateArgs) {
+
+  function three(validateArgs: any[]): ValidateArgumentStrategy {
     const arg = validateArgs[2]
-    const properties = {}
-    properties.entityObject = validateArgs[0]
-    properties.set = validateArgs[1] || 'default'
-    properties.tag = undefined
-    properties.callback = arg
-    return properties
+    const entityObject = validateArgs[0]
+    const set = validateArgs[1] || 'default'
+    const tag = undefined
+    const callback = arg
+    return { entityObject, set, tag, callback }
   }
-  function four(validateArgs) {
-    const properties = {}
-    properties.entityObject = validateArgs[0]
-    properties.set = validateArgs[1] || 'default'
-    properties.tag = validateArgs[2]
-    properties.callback = validateArgs[3]
+
+  function four(validateArgs: any[]): ValidateArgumentStrategy {
+    const properties = {
+      entityObject: validateArgs[0],
+      set: validateArgs[1] || 'default',
+      tag: validateArgs[2],
+      callback: validateArgs[3]
+    }
     return properties
   }
   return {
