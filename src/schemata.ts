@@ -1,0 +1,288 @@
+import isPrimitive from 'is-primitive'
+import clone from 'lodash.clonedeep'
+import SchemataArray from './lib/array'
+import castProperty from './lib/property-caster'
+import hasTag from './lib/has-tag'
+import isSchemata from './lib/is-schemata'
+import isSchemataArray from './lib/is-array'
+import getType from './lib/type-getter'
+import { validate, validateRecursive } from './lib/validate'
+import convertCamelcaseToHuman from './lib/camelcase-to-human-converter'
+import { ISchemata, Properties, SchemataType } from './lib/types'
+
+interface SchemataConstructor<P> {
+  name: string
+  description?: string
+  properties?: P
+}
+
+function createSchemata<P extends Properties>(
+  constructor?: SchemataConstructor<P>
+) {
+  const { name, description, properties } = constructor || {}
+  type Type = SchemataType<P>
+
+  if (name === undefined) throw new Error('name is required')
+  const internalSchema: P = clone(properties || {}) as P
+  Object.keys(internalSchema).forEach((k) => {
+    const property = internalSchema[k]
+    if (!property.defaultValue) return
+    if (typeof property.defaultValue === 'function') return
+    if (isPrimitive(property.defaultValue)) return
+    throw new Error(
+      `The defaultValue for the schema property "${k}" must be either a primitive value or a function`
+    )
+  })
+
+  const obj: ISchemata<P, Type> = {
+    getName() {
+      return name
+    },
+    getDescription() {
+      return description || ''
+    },
+    getProperties() {
+      return clone(internalSchema) as ISchemata<P, Type>['properties']
+    },
+    get properties() {
+      return clone(internalSchema) as ISchemata<P, Type>['properties']
+    },
+    /*
+     * Returns an object with properties defined in schema but with empty values.
+     *
+     * The empty value will depend on the type:
+     * - Array = []
+     * - Object = {}
+     * - String = null
+     * - Boolean = null
+     * - Number = null
+     */
+    makeBlank(): Type {
+      const newEntity = {}
+
+      Object.keys(internalSchema).forEach((key) => {
+        const type = getType(internalSchema[key].type)
+
+        // If the type is a schemata instance use its makeBlank() function
+        if (isSchemata(type)) {
+          newEntity[key] = type.makeBlank()
+          return null
+        }
+
+        // If the type is a schemata array, create an empty array
+        if (isSchemataArray(type)) {
+          newEntity[key] = []
+          return null
+        }
+
+        if (typeof type === 'object') {
+          throw new Error(`Invalid property type on '${key}'`)
+        }
+
+        switch (type) {
+          case Object:
+            newEntity[key] = {}
+            return null
+          case Array:
+            newEntity[key] = []
+            return null
+          default:
+            newEntity[key] = null
+        }
+      })
+
+      return newEntity
+    },
+
+    /*
+     * Returns a new object with properties and default values from the schema definition.
+     * If existingEntity is passed then extends it with the default properties.
+     */
+    makeDefault(existingEntity?: any): Type {
+      const newEntity = this.makeBlank()
+
+      if (!existingEntity) existingEntity = {}
+
+      Object.keys(internalSchema).forEach((key) => {
+        const property = internalSchema[key]
+        const existingValue = existingEntity[key]
+        const type = getType(property.type, existingEntity)
+
+        // If an existingEntity is passed then use its value
+        // If it doesn't have that property then the default will be used.
+        // If an existingEntity is a schemata instance it's own makeDefault() will
+        // also be called so that partial sub-objects can be used.
+        if (existingEntity !== undefined && existingEntity[key] !== undefined) {
+          newEntity[key] = isSchemata(type)
+            ? type.makeDefault(existingValue)
+            : existingEntity[key]
+          return
+        }
+
+        switch (typeof property.defaultValue) {
+          case 'undefined':
+            // If the property is a schemata instance use its makeDefault() function
+            if (isSchemata(type)) {
+              newEntity[key] = type.makeDefault(existingValue)
+              return
+            }
+            // In the absence of a defaultValue property the makeBlank() value is used
+            return
+          case 'function':
+            // In the case of a defaultValue() function, run it to create the default
+            // value. This is important when using mutable values like Object and Array
+            // which would be a reference to the schema's property if it were set as
+            // property.defaultValue = Object|Array|Date
+            newEntity[key] = property.defaultValue()
+            return
+          default:
+            // If defaultValue is a primitive value use it as-is
+            newEntity[key] = property.defaultValue
+        }
+      })
+
+      return newEntity
+    },
+
+    /*
+     * Takes an object and strips out properties not in the schema. If a tag is given
+     * then only properties with that tag will remain.
+     */
+    stripUnknownProperties(
+      entityObject,
+      tag?: string,
+      ignoreTagForSubSchemas?: boolean
+    ) {
+      const newEntity = {}
+
+      Object.keys(entityObject).forEach((key) => {
+        const property = internalSchema[key]
+        let subSchemaTag
+
+        // If the schema doesn't have this property, or if the property is in
+        // the schema but doesn't have the given tag, don't keep it
+        if (
+          typeof property === 'undefined' ||
+          !hasTag(internalSchema, key, tag)
+        )
+          return
+
+        const type = getType(property.type, entityObject)
+
+        // If the property is null, leave it alone
+        if (entityObject[key] === null) {
+          newEntity[key] = null
+          return
+        }
+
+        // If the type is a schemata instance use its stripUnknownProperties() function
+        if (isSchemata(type)) {
+          subSchemaTag = ignoreTagForSubSchemas ? undefined : tag
+          newEntity[key] = type.stripUnknownProperties(
+            entityObject[key],
+            subSchemaTag,
+            ignoreTagForSubSchemas
+          )
+          return
+        }
+
+        // If the type is a schemata array, call stripUnknownProperties() on each item in the array
+        if (isSchemataArray(property.type)) {
+          // The array can't be processed if it's not an array
+          if (!Array.isArray(entityObject[key])) return
+
+          // Create a new array to copy items over to
+          newEntity[key] = []
+
+          subSchemaTag = ignoreTagForSubSchemas ? undefined : tag
+          entityObject[key].forEach((item, index) => {
+            newEntity[key][index] =
+              property.type.arraySchema.stripUnknownProperties(
+                item,
+                subSchemaTag,
+                ignoreTagForSubSchemas
+              )
+          })
+
+          return
+        }
+
+        // If this property is of a primitive type, keep it as is
+        if (typeof property.type !== 'object') {
+          newEntity[key] = entityObject[key]
+        }
+      })
+
+      return newEntity
+    },
+
+    /*
+     * Casts all the properties in the given entityObject that are defined in the schema.
+     * If tag is provided then only properties that are in the schema and have the given tag will be cast.
+     */
+    cast(entityObject, tag) {
+      const newEntity = {}
+
+      Object.keys(entityObject).forEach((key) => {
+        // Copy all properties
+        newEntity[key] = entityObject[key]
+
+        // Only cast properties in the schema and tagged, if tag is provided
+        if (
+          internalSchema[key] !== undefined &&
+          internalSchema[key].type &&
+          hasTag(internalSchema, key, tag)
+        ) {
+          newEntity[key] = castProperty(
+            internalSchema[key].type,
+            entityObject[key],
+            key,
+            entityObject
+          )
+        }
+      })
+
+      return newEntity
+    },
+
+    validate: validate(internalSchema),
+    validateRecursive: validateRecursive(internalSchema),
+    /*
+     * Returns the human readable name for a particular property.
+     */
+    propertyName(property) {
+      if (internalSchema[property] === undefined)
+        throw new RangeError(`No property '${property}' in schema`)
+      return internalSchema[property].name === undefined
+        ? convertCamelcaseToHuman(property)
+        : internalSchema[property].name
+    },
+
+    /*
+     * Extend a schema with another one. Returns a new schemata instance with combined properties.
+     */
+    extend<Q extends Properties, T extends SchemataType<Q>>(
+      schema: ISchemata<Q, T>
+    ) {
+      type JoinedProperties = P & Q
+      const self = this as ISchemata<P, Type>
+      return createSchemata<JoinedProperties>({
+        name: schema.getName() || self.getName(),
+        description: schema.getDescription() || self.getDescription(),
+        properties: {
+          ...self.getProperties(),
+          ...schema.getProperties()
+        } as JoinedProperties
+      })
+    }
+  }
+
+  return Object.assign(function () {
+    return obj.makeDefault()
+  }, obj)
+}
+
+createSchemata.Array = SchemataArray
+createSchemata.castProperty = castProperty
+export default createSchemata
+module.exports = createSchemata

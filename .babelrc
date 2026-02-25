@@ -1,5 +1,6 @@
 {
   "presets": [
+    "@babel/preset-typescript",
     [
       "@babel/preset-env",
       {
@@ -8,5 +9,9 @@
       }
     ]
   ],
-  "plugins": ["babel-plugin-transform-async-to-promises"]
+  "env": {
+    "build": {
+      "plugins": ["babel-plugin-transform-async-to-promises"]
+    }
+  }
 }
