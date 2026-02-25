@@ -69,7 +69,7 @@ describe('#makeBlank()', () => {
     const blogA = schema.makeBlank()
     const blogB = schema.makeBlank()
 
-    blogA.comments.push(1)
+    blogA.comments.push({})
     assert.strictEqual(blogA.comments.length, 1)
     assert.strictEqual(blogB.comments.length, 0)
   })

@@ -1,7 +1,7 @@
 export type ValidateFunction = (
   entityObject: any,
   ...args: any[]
-) => Promise<any> | void
+) => Promise<any>
 
 export type RecursiveValidateFunction = (
   entityObject: any,
@@ -10,9 +10,9 @@ export type RecursiveValidateFunction = (
   parent?: any
 ) => Promise<any>
 
-export interface ISchemata<P, T> {
-  readonly properties: P
-  getProperties(): P
+export interface ISchemata<P extends Properties, T> {
+  readonly properties: MutableProperties<P>
+  getProperties(): MutableProperties<P>
   getName(): string
   getDescription(): string
   makeDefault(existingEntity?: any): T
@@ -39,6 +39,15 @@ export interface Property {
   validators?: any
   [key: string]: any
 }
+
+export type MutableProperty<P extends Property> = Omit<P, keyof Property> &
+  Property
+export type MutableProperties<P extends Properties> = {
+  [K in keyof P]: MutableProperty<P[K]>
+}
+export type SchemataFactory<P extends Properties, T> = (
+  entityObject?: any
+) => ISchemata<P, T>
 
 export type SchemataType<T extends Record<string, { type?: any }>> = {
   [P in keyof T]?: T[P]['type'] extends { new () }

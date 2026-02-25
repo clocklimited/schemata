@@ -125,7 +125,7 @@ describe('#makeDefault()', () => {
     const blogA = schema.makeDefault()
     const blogB = schema.makeDefault()
 
-    blogA.comments.push(1)
+    blogA.comments.push({})
     assert.strictEqual(blogA.comments.length, 1)
     assert.strictEqual(blogB.comments.length, 0)
   })

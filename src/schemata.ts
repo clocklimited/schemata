@@ -17,17 +17,18 @@ interface SchemataConstructor<P> {
 }
 
 function createSchemata<P extends Properties>(
-  constructor: SchemataConstructor<P>
+  constructor?: SchemataConstructor<P>
 ) {
   const { name, description, properties } = constructor || {}
-  type Type = SchemataType<typeof properties>
+  type Type = SchemataType<P>
 
   if (name === undefined) throw new Error('name is required')
   const internalSchema: P = clone(properties || {}) as P
   Object.keys(internalSchema).forEach((k) => {
-    if (!properties[k].defaultValue) return
-    if (typeof properties[k].defaultValue === 'function') return
-    if (isPrimitive(properties[k].defaultValue)) return
+    const property = internalSchema[k]
+    if (!property.defaultValue) return
+    if (typeof property.defaultValue === 'function') return
+    if (isPrimitive(property.defaultValue)) return
     throw new Error(
       `The defaultValue for the schema property "${k}" must be either a primitive value or a function`
     )
@@ -41,10 +42,10 @@ function createSchemata<P extends Properties>(
       return description || ''
     },
     getProperties() {
-      return clone(internalSchema)
+      return clone(internalSchema) as ISchemata<P, Type>['properties']
     },
     get properties() {
-      return clone(internalSchema)
+      return clone(internalSchema) as ISchemata<P, Type>['properties']
     },
     /*
      * Returns an object with properties defined in schema but with empty values.
@@ -271,7 +272,7 @@ function createSchemata<P extends Properties>(
         properties: {
           ...self.getProperties(),
           ...schema.getProperties()
-        }
+        } as JoinedProperties
       })
     }
   }

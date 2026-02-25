@@ -99,7 +99,7 @@ describe('#stripUnknownProperties()', () => {
     const schema = createBlogSchema()
     const comment = createCommentSchema().makeBlank()
 
-    comment.extra = 'Hello'
+    ;(comment as any).extra = 'Hello'
     assert.deepStrictEqual(
       schema.stripUnknownProperties({
         author: { name: 'Paul' },
@@ -117,7 +117,7 @@ describe('#stripUnknownProperties()', () => {
     const comment = createCommentSchema().makeBlank()
 
     comment.comment = 'Do not strip out my comment'
-    comment.extra = 'This will be striped as its not in the schema at all'
+    ;(comment as any).extra = 'This will be striped as its not in the schema at all'
     assert.deepStrictEqual(
       schema.stripUnknownProperties(
         { title: 'My Blog', author: { name: 'Paul' }, comments: [comment] },
@@ -138,7 +138,7 @@ describe('#stripUnknownProperties()', () => {
     const comment = createCommentSchema().makeBlank()
 
     comment.comment = 'Do not strip out my comment'
-    comment.extra = 'Hello'
+    ;(comment as any).extra = 'Hello'
     assert.deepStrictEqual(
       schema.stripUnknownProperties(
         { title: 'My Blog', author: { name: 'Paul' }, comments: [comment] },

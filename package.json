@@ -64,10 +64,11 @@
   "scripts": {
     "lint:js": "eslint . -f unix --cache --ext '.js'",
     "prettier": "prettier --write **/*.{js,ts}",
-    "test": "yarn test:code && yarn lint:js",
+    "test": "yarn test:types && yarn test:code && yarn lint:js",
     "run-test": "NODE_OPTIONS='--no-experimental-strip-types' mocha --require ./test/babel-register.js --extension ts",
     "test:code": "NODE_OPTIONS='--no-experimental-strip-types' nyc mocha --require ./test/babel-register.js --extension ts",
     "test:watch": "NODE_OPTIONS='--no-experimental-strip-types' mocha --watch --require ./test/babel-register.js --extension ts",
+    "test:types": "tsc --noEmit",
     "tsc": "tsc --noEmit",
     "build": "rm -rf dist && mkdir dist && BABEL_ENV=build babel --extensions \".ts,.js\" src/schemata.ts -d dist && BABEL_ENV=build babel --extensions \".ts,.js\" src/lib -d dist/lib",
     "prepublish": "yarn test && yarn build"

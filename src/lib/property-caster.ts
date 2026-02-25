@@ -18,7 +18,12 @@ import castString from './casters/string'
  * Throws error if type is undefined.
  *
  */
-const castProperty = (type: any, value: any, key: string, entityObject?: any): any => {
+const castProperty = (
+  type: any,
+  value?: any,
+  key?: string,
+  entityObject?: any
+): any => {
   if (type === undefined) throw new Error('Missing type')
 
   // First check whether the type of this property is
