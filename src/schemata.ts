@@ -13,7 +13,7 @@ import { ISchemata, Properties, SchemataType } from './lib/types'
 interface SchemataConstructor<P> {
   name: string
   description?: string
-  properties: P
+  properties?: P
 }
 
 function createSchemata<P extends Properties>(

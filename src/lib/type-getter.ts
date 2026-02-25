@@ -1,4 +1,4 @@
-const isSchemata = require('./is-schemata')
+import isSchemata from './is-schemata'
 
 /*
  * Gets the type of a property. It either returns
@@ -6,7 +6,7 @@ const isSchemata = require('./is-schemata')
  * calls a function. If that function returns a schemata
  * instance, that is returned. Else we return the type as is.
  */
-const getType = (type, entityObject) => {
+const getType = (type: any, entityObject?: any): any => {
   if (typeof type !== 'function') return type
 
   const schemataInstance = type(entityObject)
@@ -14,4 +14,5 @@ const getType = (type, entityObject) => {
   return isSchemata(schemataInstance) ? schemataInstance : type
 }
 
+export default getType
 module.exports = getType

@@ -1,8 +1,6 @@
-const assert = require('assert')
-const schemata = require('../src/schemata')
-const helpers = require('./helpers')
-const createContactSchema = helpers.createContactSchema
-const createBlogSchema = helpers.createBlogSchema
+import assert from 'assert'
+import schemata from '../src/schemata'
+import { createContactSchema, createBlogSchema } from './helpers'
 
 describe('#makeBlank()', () => {
   it('returns correct empty object with no parameters', () => {

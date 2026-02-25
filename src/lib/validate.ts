@@ -1,11 +1,10 @@
 import { RecursiveValidateFunction, ValidateFunction } from './types'
-
-const promisify = require('util.promisify')
-const hasTag = require('./has-tag')
-const isSchemata = require('./is-schemata')
-const isSchemataArray = require('./is-array')
-const getType = require('./type-getter')
-const convertCamelcaseToHuman = require('./camelcase-to-human-converter')
+import promisify from 'util.promisify'
+import hasTag from './has-tag'
+import isSchemata from './is-schemata'
+import isSchemataArray from './is-array'
+import getType from './type-getter'
+import convertCamelcaseToHuman from './camelcase-to-human-converter'
 
 interface ValidateArgumentStrategy {
   entityObject: any
@@ -78,7 +77,8 @@ const validateArraySchema = async (
   entityObject,
   propertyName,
   property,
-  set
+  set,
+  parent?
 ) => {
   // In order to validate, type must be a schemata array and the property must be an array with length
   if (

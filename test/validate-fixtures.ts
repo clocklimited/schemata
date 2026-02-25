@@ -1,4 +1,4 @@
-module.exports.blog = {
+export const blog = {
   title: null,
   body: null,
   author: {
@@ -11,7 +11,7 @@ module.exports.blog = {
   comments: []
 }
 
-module.exports.expectedParents = [
+export const expectedParents = [
   {
     title: null,
     body: null,
@@ -37,3 +37,4 @@ module.exports.expectedParents = [
     comments: []
   }
 ]
+module.exports = { blog, expectedParents }

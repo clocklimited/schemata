@@ -1,7 +1,7 @@
-const schemata = require('../src/schemata')
-const SchemataArray = require('../src/lib/array')
-const castProperty = require('../src/lib/property-caster')
-const assert = require('assert')
+import schemata from '../src/schemata'
+import SchemataArray from '../src/lib/array'
+import castProperty from '../src/lib/property-caster'
+import assert from 'assert'
 
 describe('schemata', () => {
   it('should export .Array', () => {

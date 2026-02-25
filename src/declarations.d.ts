@@ -1,0 +1,6 @@
+declare module 'is-primitive'
+declare module 'util.promisify'
+declare module 'validity'
+declare module 'validity-required'
+declare module 'validity-length'
+declare module 'async'

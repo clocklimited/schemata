@@ -1,6 +1,6 @@
-const schemata = require('../src/schemata')
-const isSchemata = require('../src/lib/is-schemata')
-const assert = require('assert')
+import schemata from '../src/schemata'
+import isSchemata from '../src/lib/is-schemata'
+import assert from 'assert'
 
 describe('#isSchemata()', () => {
   it('should return true if it is a schemata object', () => {

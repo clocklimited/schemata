@@ -1,10 +1,10 @@
-const assert = require('assert')
-const schemata = require('../src/schemata')
-const {
+import assert from 'assert'
+import schemata from '../src/schemata'
+import {
   createContactSchema,
   createBlogSchema,
   createNamedSchemata
-} = require('./helpers')
+} from './helpers'
 
 describe('#makeDefault()', () => {
   it('without a customer schema creates a empty object', () => {
@@ -68,11 +68,11 @@ describe('#makeDefault()', () => {
     const schema = createBlogSchema()
     assert.deepStrictEqual(
       schema.makeDefault({
-        title: 'Mr. Blogger’s Post',
+        title: 'Mr. Blogger\u2019s Post',
         author: { name: 'Mr. Blogger' }
       }),
       {
-        title: 'Mr. Blogger’s Post',
+        title: 'Mr. Blogger\u2019s Post',
         body: null,
         author: {
           name: 'Mr. Blogger',
@@ -133,13 +133,13 @@ describe('#makeDefault()', () => {
   it('makes default on sub-schema objects if type is a function', () => {
     const schema = createBlogSchema()
 
-    const obj = { title: 'Mr. Blogger’s Post', author: { name: 'Mr. Blogger' } }
+    const obj = { title: 'Mr. Blogger\u2019s Post', author: { name: 'Mr. Blogger' } }
 
     let called = false
 
     // This function gets called twice, once in makeBlank and once for makeDefault.
     // We want to test the 2nd call
-    schema.getProperties().author.type = (model) => {
+    schema.getProperties().author.type = (model: any) => {
       if (called === false) return createContactSchema()
       called = true
       assert.deepStrictEqual(model, obj)
@@ -147,7 +147,7 @@ describe('#makeDefault()', () => {
     }
 
     assert.deepStrictEqual(schema.makeDefault(obj), {
-      title: 'Mr. Blogger’s Post',
+      title: 'Mr. Blogger\u2019s Post',
       body: null,
       author: {
         name: 'Mr. Blogger',

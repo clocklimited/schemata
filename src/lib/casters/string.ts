@@ -3,4 +3,5 @@ function castString(value: any): String {
   return value.toString && value.toString()
 }
 
+export default castString
 module.exports = castString

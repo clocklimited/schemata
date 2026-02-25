@@ -1,8 +1,9 @@
-const isSchemata = require('./is-schemata')
+import isSchemata from './is-schemata'
+
 /*
  * Take an object and determine whether it is a schemata array type.
  */
-const isArray = (obj) => {
+const isArray = (obj: any): boolean => {
   // Schemata array types must be objects
   if (typeof obj !== 'function') return false
 
@@ -10,7 +11,5 @@ const isArray = (obj) => {
   return isSchemata(obj.arraySchema)
 }
 
-// (typeof property.type.arraySchema !== 'undefined') &&
-// (typeof property.type.arraySchema.stripUnknownProperties === 'function')
-
+export default isArray
 module.exports = isArray

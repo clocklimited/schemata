@@ -1,8 +1,9 @@
-const assert = require('assert')
-const helpers = require('./helpers')
-const createContactSchema = helpers.createContactSchema
-const createBlogSchema = helpers.createBlogSchema
-const createCommentSchema = helpers.createCommentSchema
+import assert from 'assert'
+import {
+  createContactSchema,
+  createBlogSchema,
+  createCommentSchema
+} from './helpers'
 
 describe('#stripUnknownProperties()', () => {
   it('strips out extra properties', () => {
@@ -76,8 +77,8 @@ describe('#stripUnknownProperties()', () => {
     const schema = createBlogSchema()
     const obj = { author: { name: 'Paul', extra: 'Not here' } }
 
-    schema.getProperties().author.type = (model) => {
-      assert.deepdeepStrictEqual(model, obj)
+    schema.getProperties().author.type = (model: any) => {
+      assert.deepStrictEqual(model, obj)
       return createContactSchema()
     }
 

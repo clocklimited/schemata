@@ -85,6 +85,12 @@ const { title, category, author: extendedAuthor } = extended.makeDefault()
 const createNamedSchemata = (properties) =>
   schemata({ name: 'Foo', properties })
 
+export {
+  createContactSchema,
+  createBlogSchema,
+  createCommentSchema,
+  createNamedSchemata
+}
 module.exports = {
   createContactSchema,
   createBlogSchema,

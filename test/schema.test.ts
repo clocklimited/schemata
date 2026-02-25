@@ -1,5 +1,5 @@
-const schemata = require('../src/schemata')
-const assert = require('assert')
+import schemata from '../src/schemata'
+import assert from 'assert'
 
 describe('#schema', () => {
   it('should throw if name is missing', () => {

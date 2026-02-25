@@ -1,13 +1,12 @@
-const assert = require('assert')
-const {
+import assert from 'assert'
+import {
   createContactSchema,
   createBlogSchema,
   createNamedSchemata
-} = require('./helpers')
-const { castProperty } = require('../src/schemata')
-const castFixtures = require('./cast-fixtures')
-const assertions = castFixtures.assertions
-const typeMap = castFixtures.typeMap
+} from './helpers'
+import schemata from '../src/schemata'
+const { castProperty } = schemata
+import { assertions, typeMap } from './cast-fixtures'
 const required = require('validity-required')
 
 describe('#cast()', () => {
@@ -22,7 +21,7 @@ describe('#cast()', () => {
   })
 
   it('converts arrays correctly', () => {
-    ;[[], null, ''].forEach((value) => {
+    ;([] as any[]).concat([[], null, '']).forEach((value: any) => {
       assert.strictEqual(Array.isArray(castProperty(Array, value)), true)
       assert.strictEqual(castProperty(Array, value).length, 0)
     })
@@ -100,7 +99,7 @@ describe('#cast()', () => {
       comments: []
     }
 
-    schema.getProperties().author.type = (model) => {
+    schema.getProperties().author.type = (model: any) => {
       assert.deepStrictEqual(model, initialObj)
       return createContactSchema()
     }
@@ -114,7 +113,7 @@ describe('#cast()', () => {
 
     const initialObj = { title: 'My Blog', author: null, comments: [] }
 
-    schema.getProperties().author.type = (model) => {
+    schema.getProperties().author.type = (model: any) => {
       assert.deepStrictEqual(model, initialObj)
       return createContactSchema()
     }
@@ -139,10 +138,10 @@ describe('#cast()', () => {
     const vehicleSchema = createNamedSchemata({
       type: { type: String },
       tyreWear: {
-        type(obj) {
+        type(obj: any) {
           // This function takes any configuration of tyres and
           // just ensures that each of the values is a number
-          const schema = {}
+          const schema: any = {}
           if (!obj || !obj.tyreWear) return createNamedSchemata(schema)
           Object.keys(obj.tyreWear).forEach((k) => {
             schema[k] = {

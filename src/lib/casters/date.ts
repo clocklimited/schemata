@@ -6,4 +6,5 @@ function castDate(value: any): Date {
     : new Date(value)
 }
 
+export default castDate
 module.exports = castDate

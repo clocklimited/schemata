@@ -6,4 +6,5 @@ function castArray(value: any): any[] {
     : [value]
 }
 
+export default castArray
 module.exports = castArray

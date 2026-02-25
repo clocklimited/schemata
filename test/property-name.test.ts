@@ -1,6 +1,5 @@
-const assert = require('assert')
-const helpers = require('./helpers')
-const createContactSchema = helpers.createContactSchema
+import assert from 'assert'
+import { createContactSchema } from './helpers'
 
 describe('#propertyName()', () => {
   it('returns name when available', () => {

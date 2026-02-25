@@ -4,4 +4,5 @@ function castBoolean(value: any): boolean {
   return falsey.indexOf(value) === -1
 }
 
+export default castBoolean
 module.exports = castBoolean

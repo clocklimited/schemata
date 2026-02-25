@@ -1,12 +1,13 @@
-const isSchemata = require('./is-schemata')
-const isSchemataArray = require('./is-array')
-const getType = require('./type-getter')
-const castArray = require('./casters/array')
-const castBoolean = require('./casters/boolean')
-const castDate = require('./casters/date')
-const castNumber = require('./casters/number')
-const castObject = require('./casters/object')
-const castString = require('./casters/string')
+import isSchemata from './is-schemata'
+import isSchemataArray from './is-array'
+import getType from './type-getter'
+import castArray from './casters/array'
+import castBoolean from './casters/boolean'
+import castDate from './casters/date'
+import castNumber from './casters/number'
+import castObject from './casters/object'
+import castString from './casters/string'
+
 /**
  * Casts a value to a given type.
  *
@@ -17,7 +18,7 @@ const castString = require('./casters/string')
  * Throws error if type is undefined.
  *
  */
-const castProperty = (type, value, key, entityObject) => {
+const castProperty = (type: any, value: any, key: string, entityObject?: any): any => {
   if (type === undefined) throw new Error('Missing type')
 
   // First check whether the type of this property is
@@ -31,7 +32,7 @@ const castProperty = (type, value, key, entityObject) => {
   if (isSchemataArray(type)) {
     if (!value) return null
     if (!Array.isArray(value)) value = [value]
-    return value.map((v) => type.arraySchema.cast(v))
+    return value.map((v: any) => type.arraySchema.cast(v))
   }
 
   // If the { type: x } is a primitive constructor, use
@@ -54,4 +55,5 @@ const castProperty = (type, value, key, entityObject) => {
   }
 }
 
+export default castProperty
 module.exports = castProperty

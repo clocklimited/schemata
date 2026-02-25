@@ -3,4 +3,5 @@ function castObject(value: any): any {
   return typeof value !== 'object' ? {} : value
 }
 
+export default castObject
 module.exports = castObject

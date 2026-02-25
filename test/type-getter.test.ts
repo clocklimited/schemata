@@ -1,6 +1,6 @@
-const getType = require('../src/lib/type-getter')
-const schemata = require('../src/schemata')
-const assert = require('assert')
+import getType from '../src/lib/type-getter'
+import schemata from '../src/schemata'
+import assert from 'assert'
 
 describe('#getType()', () => {
   it('should return type if it is a not a function', () => {
@@ -16,7 +16,7 @@ describe('#getType()', () => {
   it('should call the function with the model if provided', () => {
     const model = { a: 1 }
     const schema = schemata({ name: 'Person' })
-    const type = (m) => {
+    const type = (m: any) => {
       assert.deepStrictEqual(m, model)
       return schema
     }

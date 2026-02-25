@@ -1,9 +1,7 @@
 export type ValidateFunction = (
   entityObject: any,
-  set?: string,
-  tag?: string,
-  callback?: (error: Error | null, response: any) => void
-) => Promise<any>
+  ...args: any[]
+) => Promise<any> | void
 
 export type RecursiveValidateFunction = (
   entityObject: any,
@@ -28,24 +26,18 @@ export interface ISchemata<P, T> {
   validate: ValidateFunction
   validateRecursive: RecursiveValidateFunction
   propertyName(propertyName: string): string
-  extend<Q extends Properties, U extends SchemataType<Q>>(
-    schema: ISchemata<Q, U>
-  ): ISchemata<P & Q, T & U>
-  (): T
+  extend<Q extends Properties>(
+    schema: ISchemata<Q, any>
+  ): ISchemata<P & Q, SchemataType<P & Q>>
 }
 
 export interface Property {
-  type?: Number | String | Boolean | Date | Array<any> | Object
+  type?: any
   name?: string
-  defaultValue?:
-    | Number
-    | String
-    | Boolean
-    | Date
-    | Array<any>
-    | Object
-    | Function
+  defaultValue?: any
   tag?: string | string[]
+  validators?: any
+  [key: string]: any
 }
 
 export type SchemataType<T extends Record<string, { type?: any }>> = {

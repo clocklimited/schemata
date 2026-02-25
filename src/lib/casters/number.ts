@@ -3,4 +3,5 @@ function castNumber(value: any): number {
   return Number(value)
 }
 
+export default castNumber
 module.exports = castNumber
